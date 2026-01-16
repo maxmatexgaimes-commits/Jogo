@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Nossa História Infinita 💖</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Comic Sans MS',cursive}
+body{overflow:hidden;color:#5a2a3d}
+
+/* ===== TELAS ===== */
+.tela{
+  position:fixed; inset:0;
+  display:none;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  text-align:center;
+  background-size:cover;
+  background-position:center;
+}
+.ativa{display:flex}
+
+/* ===== OVERLAY ===== */
+.overlay{
+  background:rgba(255,255,255,.7);
+  padding:20px;
+  border-radius:25px;
+}
+
+/* ===== BRILHO TEXTO ===== */
+.brilho{
+  background:linear-gradient(90deg,#ff7eb6,#ffd1e8,#ff7eb6);
+  background-size:200%;
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:brilho 3s linear infinite;
+}
+@keyframes brilho{to{background-position:200%}}
+
+/* ===== BOTÕES ===== */
+button{
+  padding:12px 40px;
+  margin:10px;
+  border:none;
+  border-radius:30px;
+  background:#ff7eb6;
+  color:white;
+  font-size:1.1em;
+  cursor:pointer;
+}
+
+/* ===== PLAYER ===== */
+#player{
+  position:fixed;
+  bottom:15px; right:15px;
+  background:#fff;
+  padding:10px 15px;
+  border-radius:30px;
+  display:flex; gap:10px;
+  z-index:999;
+}
+
+/* ===== DIÁLOGO ===== */
+#dialogo{
+  position:absolute;
+  bottom:0;
+  width:100%;
+  background:rgba(255,255,255,.95);
+  padding:20px;
+  border-radius:30px 30px 0 0;
+}
+#nome{font-weight:bold}
+
+/* ===== LIVRO ===== */
+#livro{
+  position:fixed;
+  bottom:5px;
+  white-space:nowrap;
+  animation:livro 15s linear infinite;
+}
+@keyframes livro{from{left:100%}to{left:-100%}}
+
+/* ===== JOGO ===== */
+#jogo{background:linear-gradient(#ffeef7,#fff)}
+#max{position:absolute;bottom:40px;font-size:55px}
+.coracao{
+  position:absolute;top:-40px;
+  animation:cair linear;
+}
+@keyframes cair{to{transform:translateY(120vh)}}
+
+/* ===== BRILHO PNG ===== */
+.sparkle{
+  position:absolute;
+  width:40px;
+  animation:spark 6s linear infinite;
+}
+@keyframes spark{
+  from{transform:translateY(120vh) scale(.5);opacity:0}
+  to{transform:translateY(-20vh) scale(1.2);opacity:1}
+}
+</style>
+</head>
+
+<body>
+
+<audio id="audio" loop></audio>
+
+<!-- PLAYER -->
+<div id="player">
+  <button onclick="prev()">⏮️</button>
+  <button onclick="play()">⏯️</button>
+  <button onclick="next()">⏭️</button>
+</div>
+
+<!-- LIVRO -->
+<div id="livro">📖✒️ Nossa história está sendo escrita… e não vai acabar nunca 💖</div>
+
+<!-- INTRO -->
+<div id="intro" class="tela ativa">
+  <video autoplay muted playsinline style="width:100%;height:100%;object-fit:cover">
+    <source src="intro.mp4">
+  </video>
+  <button onclick="enter()" style="position:absolute;bottom:40px">
+    Entrar na nossa história 💖
+  </button>
+</div>
+
+<!-- INÍCIO -->
+<div id="inicio" class="tela" style="background-image:url('bg-por-do-sol.jpg')">
+  <div class="overlay">
+    <h1 class="brilho">Nossa História Infinita 💖</h1>
+    <p>Max & Andrelly</p>
+    <button onclick="start()">Começar</button>
+  </div>
+</div>
+
+<!-- VISUAL NOVEL -->
+<div id="novel" class="tela">
+  <div id="dialogo">
+    <div id="nome"></div>
+    <div id="texto"></div>
+    <img id="icone" style="width:40px;margin-top:10px">
+    <button onclick="nextStory()">Continuar</button>
+  </div>
+</div>
+
+<!-- JOGO -->
+<div id="jogo" class="tela">
+  <div id="max">👦</div>
+  <div id="dialogo">
+    <div id="nome">Narrador</div>
+    <div id="texto">Colete os corações do amor 💗</div>
+  </div>
+</div>
+
+<!-- FOTOS -->
+<div id="fotos" class="tela" style="background-image:url('bg-cerejeira.jpg')">
+  <div class="overlay">
+    <h2>📸 Memórias</h2>
+    <img id="img" style="width:300px;border-radius:25px">
+    <p>Cada foto guarda um pedacinho do nosso amor 🌸</p>
+    <button onclick="foto()">Próxima</button>
+  </div>
+</div>
+
+<!-- FINAL -->
+<div id="final" class="tela" style="background-image:url('bg-noite.jpg')">
+  <div class="overlay">
+    <h1 class="brilho">Final Feliz 💍</h1>
+    <p id="tempo"></p>
+  </div>
+</div>
+
+<script>
+/* ===== TELAS ===== */
+const telas=document.querySelectorAll(".tela");
+const audio=document.getElementById("audio");
+function show(id){
+  telas.forEach(t=>t.classList.remove("ativa"));
+  document.getElementById(id).classList.add("ativa");
+}
+
+/* ===== PLAYLIST ===== */
+const musicas=["musica1.mp3","musica2.mp3","musica3.mp3"];
+let m=0;
+function tocar(){audio.src=musicas[m];audio.volume=.6;audio.play()}
+function play(){audio.paused?audio.play():audio.pause()}
+function next(){m=(m+1)%musicas.length;tocar()}
+function prev(){m=(m-1+musicas.length)%musicas.length;tocar()}
+
+/* ===== INTRO ===== */
+function enter(){tocar();show("inicio")}
+
+/* ===== HISTÓRIA ===== */
+const historia=[
+ ["Narrador","Em 11 de setembro de 2025, tudo começou 🌅","carta.png","bg-por-do-sol.jpg"],
+ ["Max","Você chegou e mudou tudo 💖","flor.png","bg-cerejeira.jpg"],
+ ["Andrelly","Meu coração encontrou o seu 🌸","estrela.png","bg-cerejeira.jpg"],
+ ["Narrador","E sob as estrelas, o amor cresceu ✨","brilho.png","bg-noite.jpg"]
+];
+let i=0;
+
+function start(){show("novel");nextStory()}
+function nextStory(){
+  if(i<historia.length){
+    nome.innerText=historia[i][0];
+    texto.innerText=historia[i][1];
+    icone.src=historia[i][2];
+    novel.style.backgroundImage=`url('${historia[i][3]}')`;
+    i++;
+  }else iniciarJogo();
+}
+
+/* ===== JOGO ===== */
+let pontos=0;
+function iniciarJogo(){
+  m=1;tocar();show("jogo");
+  setInterval(spawn,700);
+}
+function spawn(){
+  const c=document.createElement("img");
+  c.src="heart.png";
+  c.className="coracao";
+  c.style.width="35px";
+  c.style.left=Math.random()*90+"%";
+  c.style.animationDuration="5s";
+  jogo.appendChild(c);
+  c.onclick=()=>{
+    pontos++;c.remove();
+    if(pontos>=6) iniciarFotos();
+  };
+  setTimeout(()=>c.remove(),5000);
+}
+
+/* ===== FOTOS ===== */
+let f=1;
+function iniciarFotos(){m=2;tocar();show("fotos");img.src="foto1.jpg"}
+function foto(){
+  f++;
+  if(f>10) finalizar();
+  else img.src="foto"+f+".jpg";
+}
+
+/* ===== FINAL ===== */
+function finalizar(){
+  show("final");
+  const inicio=new Date("2025-09-11T00:00:00");
+  setInterval(()=>{
+    const d=new Date()-inicio;
+    tempo.innerText=
+    `Estamos juntos há ${Math.floor(d/86400000)} dias 💖`;
+  },1000);
+}
+</script>
+
+</body>
+</html>
