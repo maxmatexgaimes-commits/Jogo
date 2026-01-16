@@ -39,13 +39,16 @@ body{background:#fff;color:var(--texto);overflow:hidden}
 
 /* BOTÕES */
 button{
-  padding:14px 36px;
+  padding:14px 34px;
   border:none;
   border-radius:30px;
   background:var(--rosa);
   color:#fff;
-  margin-top:14px;
+  margin-top:12px;
   box-shadow:0 8px 18px rgba(0,0,0,.25);
+}
+.secondary{
+  background:#f1a7c7;
 }
 button:active{transform:scale(.96)}
 
@@ -75,15 +78,12 @@ button:active{transform:scale(.96)}
   border-radius:30px 30px 0 0;
 }
 
-/* ESCOLHAS */
-#choices{display:flex;flex-direction:column;gap:12px;margin-top:14px}
-.choice{background:var(--rosa2);padding:14px;border-radius:25px;border:none}
-
 /* EFEITOS */
 .effect{
   position:absolute;
   font-size:26px;
   animation:float 3s ease-out forwards;
+  pointer-events:none;
 }
 @keyframes float{
   from{opacity:1;transform:translateY(0)}
@@ -108,6 +108,16 @@ button:active{transform:scale(.96)}
 }
 @keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
 
+/* MENSAGEM */
+#toast{
+  position:fixed;
+  bottom:90px;
+  background:var(--rosa2);
+  padding:14px 20px;
+  border-radius:20px;
+  display:none;
+}
+
 /* FOTO */
 #photo{width:300px;max-width:90vw;border-radius:25px}
 </style>
@@ -117,6 +127,7 @@ button:active{transform:scale(.96)}
 
 <audio id="audio"></audio>
 <div id="book">📖✒️ Nossa história está sendo escrita… e não vai acabar nunca 💖</div>
+<div id="toast"></div>
 
 <!-- INTRO -->
 <div id="intro" class="screen active">
@@ -131,7 +142,8 @@ button:active{transform:scale(.96)}
   <div class="dialog">
     <strong id="name"></strong>
     <p id="text"></p>
-    <div id="choices"></div>
+    <button onclick="nextChapter()">Avançar 💖</button>
+    <button class="secondary" onclick="skipStory()">Pular história</button>
   </div>
 </div>
 
@@ -145,6 +157,7 @@ button:active{transform:scale(.96)}
     <p>Conexão emocional 💞</p>
     <div id="bar"><div id="fill"></div></div>
     <button onclick="connect()">Dar um passo 💗</button>
+    <button class="secondary" onclick="restartGame()">Recomeçar jogo</button>
   </div>
 </div>
 
@@ -157,12 +170,13 @@ button:active{transform:scale(.96)}
   </div>
 </div>
 
-<!-- FINAL NORMAL -->
+<!-- FINAL -->
 <div id="end" class="screen" style="background-image:url('bg-noite.jpg')">
   <div class="box">
     <h1 class="glow">Para sempre nós 💍</h1>
     <p id="timer"></p>
-    <p>🦫💖🦫</p>
+    <button onclick="restartAll()">Recomeçar tudo</button>
+    <button id="secretBtn" style="display:none" onclick="showSecret()">Ver final secreto 💖</button>
   </div>
 </div>
 
@@ -170,14 +184,9 @@ button:active{transform:scale(.96)}
 <div id="secret" class="screen" style="background-image:url('bg-noite.jpg')">
   <div class="box">
     <h1 class="glow">Final Secreto 💖</h1>
-    <p>
-      Andrelly…<br>
-      se você chegou até aqui,<br>
-      é porque percebeu os detalhes.<br><br>
-      Eu te escolheria em todas as versões do mundo.<br>
-      Sempre você. 💍
-    </p>
-    <p style="margin-top:15px">🦫✨🦫✨🦫</p>
+    <p>Eu te escolheria em todas as versões do mundo 💍</p>
+    <p>🦫✨🦫✨🦫</p>
+    <button onclick="restartAll()">Voltar ao início</button>
   </div>
 </div>
 
@@ -200,21 +209,18 @@ function music(){
 }
 audio.onended=()=>{track=(track+1)%playlist.length;music()};
 
-/* EFEITO */
-function effect(icon){
-  const e=document.createElement("div");
-  e.className="effect";
-  e.textContent=icon;
-  e.style.left=Math.random()*80+"%";
-  e.style.top="65%";
-  document.body.appendChild(e);
-  setTimeout(()=>e.remove(),3000);
+/* TOAST */
+function toast(msg){
+  toastEl.textContent=msg;
+  toastEl.style.display="block";
+  setTimeout(()=>toastEl.style.display="none",2500);
 }
+const toastEl=document.getElementById("toast");
 
 /* CAPIVARAS */
 let capivaras=0;
 function spawnCapivara(){
-  if(Math.random()<.4){
+  if(Math.random()<.35){
     const c=document.createElement("div");
     c.className="capivara";
     c.textContent="🦫";
@@ -222,8 +228,7 @@ function spawnCapivara(){
     c.style.top=Math.random()*60+"%";
     c.onclick=()=>{
       capivaras++;
-      effect("💖");
-      alert("🦫 Capivara feliz: o amor mora nos detalhes");
+      toast("🦫 O amor mora nos detalhes");
       c.remove();
     };
     document.body.appendChild(c);
@@ -236,8 +241,8 @@ const chapters=[
 ["Narrador","Em 11 de setembro de 2025, tudo começou 🌅"],
 ["Max","Eu me senti em casa quando te conheci 💖"],
 ["Andrelly","Seu jeito me trouxe paz 🌸"],
-["Narrador","As conversas ficaram especiais 💬"],
-["Max","Cada dia com você virou meu favorito 💕"]
+["Narrador","As conversas viraram conexão 💬"],
+["Max","Promete ficar comigo? 💍"]
 ];
 let chapter=0;
 
@@ -251,18 +256,14 @@ function loadChapter(){
   spawnCapivara();
   name.textContent=chapters[chapter][0];
   text.textContent=chapters[chapter][1];
-  choices.innerHTML="";
-  effect("✨");
-  const b=document.createElement("button");
-  b.className="choice";
-  b.textContent="Continuar 💖";
-  b.onclick=()=>{
-    chapter++;
-    if(chapter<chapters.length) loadChapter();
-    else show("game");
-  };
-  choices.appendChild(b);
 }
+
+function nextChapter(){
+  chapter++;
+  if(chapter<chapters.length) loadChapter();
+  else show("game");
+}
+function skipStory(){show("game")}
 
 /* JOGO */
 let progress=0;
@@ -270,9 +271,13 @@ function connect(){
   progress+=20;
   fill.style.width=progress+"%";
   maxChar.style.left=(6+progress/2)+"%";
-  effect("💗");
   spawnCapivara();
   if(progress>=100) startGallery();
+}
+function restartGame(){
+  progress=0;
+  fill.style.width="0%";
+  maxChar.style.left="6%";
 }
 
 /* GALERIA */
@@ -289,21 +294,20 @@ function nextPhoto(){
 
 /* FINAL */
 function finish(){
-  if(capivaras>=3){
-    show("secret");
-  }else{
-    show("end");
-    const start=new Date("2025-09-11T00:00:00");
-    setInterval(()=>{
-      const d=new Date()-start;
-      const days=Math.floor(d/86400000);
-      const h=Math.floor(d/3600000)%24;
-      const m=Math.floor(d/60000)%60;
-      const s=Math.floor(d/1000)%60;
-      timer.textContent=`Juntos há ${days} dias ${h}h ${m}m ${s}s 💖`;
-    },1000);
-  }
+  show("end");
+  if(capivaras>=3) secretBtn.style.display="inline-block";
+  const startDate=new Date("2025-09-11T00:00:00");
+  setInterval(()=>{
+    const d=new Date()-startDate;
+    const days=Math.floor(d/86400000);
+    const h=Math.floor(d/3600000)%24;
+    const m=Math.floor(d/60000)%60;
+    const s=Math.floor(d/1000)%60;
+    timer.textContent=`Juntos há ${days} dias ${h}h ${m}m ${s}s 💖`;
+  },1000);
 }
+function showSecret(){show("secret")}
+function restartAll(){location.reload()}
 </script>
 
 </body>
