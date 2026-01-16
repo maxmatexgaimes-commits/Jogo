@@ -6,19 +6,28 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
+:root{
+  --rosa:#ff7eb6;
+  --rosa-claro:#ffd1e8;
+  --texto:#5a2a3d;
+  --branco:rgba(255,255,255,.92);
+}
+
 *{
-  margin:0;padding:0;box-sizing:border-box;
-  font-family:'Comic Sans MS',cursive;
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Trebuchet MS','Comic Sans MS',cursive;
 }
 
 body{
-  overflow:hidden;
   background:#fff;
-  color:#5a2a3d;
+  color:var(--texto);
+  overflow:hidden;
 }
 
 /* ===== TELAS ===== */
-.tela{
+.screen{
   position:fixed;
   inset:0;
   display:none;
@@ -28,12 +37,12 @@ body{
   text-align:center;
   background-size:cover;
   background-position:center;
-  animation:fade .6s ease;
+  animation:fade .45s ease;
 }
-.tela.ativa{display:flex}
+.screen.active{display:flex}
 
 @keyframes fade{
-  from{opacity:0;transform:scale(.98)}
+  from{opacity:0;transform:translateY(10px)}
   to{opacity:1}
 }
 
@@ -42,258 +51,307 @@ body{
   content:"";
   position:absolute;
   inset:0;
-  background:rgba(0,0,0,.35);
-  z-index:1;
+  background:linear-gradient(
+    to bottom,
+    rgba(0,0,0,.55),
+    rgba(0,0,0,.25)
+  );
 }
 
-/* ===== OVERLAY ===== */
-.overlay{
-  background:rgba(255,255,255,.85);
-  padding:25px;
-  border-radius:25px;
+#intro button{z-index:2}
+
+/* ===== CAIXA ===== */
+.box{
+  background:var(--branco);
+  padding:26px;
+  border-radius:26px;
+  max-width:92%;
+  box-shadow:0 15px 35px rgba(0,0,0,.25);
 }
 
 /* ===== BOTÕES ===== */
 button{
-  padding:14px 45px;
+  padding:14px 38px;
   border:none;
   border-radius:30px;
-  background:#ff7eb6;
+  background:var(--rosa);
   color:white;
-  font-size:1.1em;
-  cursor:pointer;
-  box-shadow:0 8px 20px rgba(0,0,0,.25);
+  font-size:1em;
+  margin-top:15px;
+  box-shadow:0 8px 18px rgba(0,0,0,.25);
+  transition:.2s;
 }
 button:active{transform:scale(.96)}
 
-/* ===== BRILHO ===== */
-.brilho{
-  background:linear-gradient(90deg,#ff7eb6,#ffd1e8,#ff7eb6);
+/* ===== TÍTULO ===== */
+.glow{
+  background:linear-gradient(90deg,var(--rosa),#ffe6f2,var(--rosa));
   background-size:200%;
   -webkit-background-clip:text;
   -webkit-text-fill-color:transparent;
-  animation:brilho 3s linear infinite;
+  animation:glow 3s linear infinite;
 }
-@keyframes brilho{to{background-position:200%}}
-
-/* ===== PLAYER ===== */
-#player{
-  position:fixed;
-  bottom:15px;
-  right:15px;
-  background:#fff;
-  padding:10px 15px;
-  border-radius:30px;
-  display:flex;
-  gap:10px;
-  z-index:1000;
-}
+@keyframes glow{to{background-position:200%}}
 
 /* ===== DIÁLOGO ===== */
-.dialogo{
+.dialog{
   position:absolute;
   bottom:0;
   width:100%;
-  background:rgba(255,255,255,.95);
-  padding:20px;
+  background:var(--branco);
+  padding:22px;
   border-radius:30px 30px 0 0;
+  box-shadow:0 -10px 25px rgba(0,0,0,.15);
+}
+
+#name{
+  font-weight:bold;
+  font-size:1.05em;
+}
+
+#text{
+  margin-top:6px;
+  line-height:1.4em;
+}
+
+/* ===== ESCOLHAS ===== */
+#choices{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  margin-top:16px;
+}
+
+.choice{
+  background:var(--rosa-claro);
+  color:var(--texto);
+  padding:14px;
+  border-radius:25px;
+  border:none;
+  font-size:1em;
+}
+
+/* ===== EFEITOS ===== */
+.effect{
+  position:absolute;
+  font-size:26px;
+  animation:float 2.5s ease-out forwards;
+  pointer-events:none;
+}
+@keyframes float{
+  from{opacity:1;transform:translateY(0)}
+  to{opacity:0;transform:translateY(-90px)}
 }
 
 /* ===== LIVRO ===== */
-#livro{
+#book{
   position:fixed;
-  bottom:5px;
+  bottom:6px;
+  font-size:.95em;
+  opacity:.8;
   white-space:nowrap;
-  animation:livro 15s linear infinite;
+  animation:book 16s linear infinite;
 }
-@keyframes livro{
+@keyframes book{
   from{left:100%}
   to{left:-100%}
 }
 
-/* ===== JOGO ===== */
-#playerChar{
-  position:absolute;
-  bottom:50px;
-  font-size:55px;
-}
-.coracao{
-  position:absolute;
-  top:-40px;
-  animation:cair linear;
-}
-@keyframes cair{
-  to{transform:translateY(120vh)}
+/* ===== FOTOS ===== */
+#photo{
+  width:300px;
+  max-width:90vw;
+  border-radius:25px;
+  box-shadow:0 10px 30px rgba(0,0,0,.3);
 }
 </style>
 </head>
 
 <body>
 
-<audio id="audio" loop></audio>
+<audio id="audio"></audio>
 
-<div id="player">
-  <button onclick="prev()">⏮️</button>
-  <button onclick="playPause()">⏯️</button>
-  <button onclick="next()">⏭️</button>
-</div>
-
-<div id="livro">📖✒️ Nossa história está sendo escrita… e não vai acabar nunca 💖</div>
+<div id="book">📖✒️ Nossa história está sendo escrita… e não vai acabar nunca 💖</div>
 
 <!-- INTRO -->
-<div id="intro" class="tela ativa">
+<div id="intro" class="screen active">
   <video autoplay muted playsinline
-    style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0">
+    style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
     <source src="intro.mp4" type="video/mp4">
   </video>
-  <button onclick="entrar()" style="z-index:2">
-    Entrar na nossa história 💖
-  </button>
+  <button onclick="enterStory()">Entrar na nossa história 💖</button>
 </div>
 
-<!-- INÍCIO -->
-<div id="inicio" class="tela" style="background-image:url('bg-por-do-sol.jpg')">
-  <div class="overlay">
-    <h1 class="brilho">Nossa História Infinita 💖</h1>
-    <p>Max & Andrelly</p>
-    <button onclick="start()">Começar</button>
+<!-- HOME -->
+<div id="home" class="screen" style="background-image:url('bg-por-do-sol.jpg')">
+  <div class="box">
+    <h1 class="glow">Max & Andrelly 💖</h1>
+    <p>Uma história que nunca terá fim</p>
+    <button onclick="startGame()">Começar</button>
   </div>
 </div>
 
-<!-- VISUAL NOVEL -->
-<div id="novel" class="tela">
-  <div class="dialogo">
-    <strong id="nome"></strong>
-    <p id="texto"></p>
-    <img id="icone" width="40"><br>
-    <button onclick="nextStory()">Continuar</button>
+<!-- GAME -->
+<div id="game" class="screen">
+  <div class="dialog">
+    <div id="name"></div>
+    <div id="text"></div>
+    <div id="choices"></div>
   </div>
 </div>
 
-<!-- JOGO -->
-<div id="jogo" class="tela">
-  <div id="playerChar">👦</div>
-  <div class="dialogo">
-    <strong>Narrador</strong>
-    <p>Colete os corações do amor 💗</p>
+<!-- GALLERY -->
+<div id="gallery" class="screen" style="background-image:url('bg-cerejeira.jpg')">
+  <div class="box">
+    <h2>📸 Nossas Memórias</h2>
+    <img id="photo">
+    <button onclick="nextPhoto()">Próxima</button>
   </div>
 </div>
 
-<!-- FOTOS -->
-<div id="fotos" class="tela" style="background-image:url('bg-cerejeira.jpg')">
-  <div class="overlay">
-    <h2>📸 Memórias</h2>
-    <img id="fotoAtual" style="width:300px;border-radius:25px">
-    <button onclick="nextFoto()">Próxima</button>
-  </div>
-</div>
-
-<!-- FINAL -->
-<div id="final" class="tela" style="background-image:url('bg-noite.jpg')">
-  <div class="overlay">
-    <h1 class="brilho">Final Feliz 💍</h1>
-    <p id="tempo"></p>
+<!-- END -->
+<div id="end" class="screen" style="background-image:url('bg-noite.jpg')">
+  <div class="box">
+    <h1 class="glow">Para sempre nós 💍</h1>
+    <p id="timer"></p>
   </div>
 </div>
 
 <script>
 /* ===== CONTROLE DE TELAS ===== */
-const telas=document.querySelectorAll(".tela");
+const screens=[...document.querySelectorAll(".screen")];
 const show=id=>{
-  telas.forEach(t=>t.classList.remove("ativa"));
-  document.getElementById(id).classList.add("ativa");
+  screens.forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
 };
 
 /* ===== MÚSICA ===== */
 const audio=document.getElementById("audio");
 const playlist=["musica1.mp3","musica2.mp3","musica3.mp3"];
-let musica=0;
+let track=0;
 
-const tocar=()=>{audio.src=playlist[musica];audio.volume=.6;audio.play()}
-const playPause=()=>audio.paused?audio.play():audio.pause();
-const next=()=>{musica=(musica+1)%playlist.length;tocar()}
-const prev=()=>{musica=(musica-1+playlist.length)%playlist.length;tocar()}
+function playMusic(){
+  audio.src=playlist[track];
+  audio.volume=.6;
+  audio.play();
+}
+audio.onended=()=>{
+  track=(track+1)%playlist.length;
+  playMusic();
+};
 
 /* ===== INTRO ===== */
-function entrar(){tocar();show("inicio")}
+function enterStory(){
+  playMusic();
+  show("home");
+}
+
+/* ===== EFEITO ===== */
+function spawnEffect(icon){
+  const e=document.createElement("div");
+  e.className="effect";
+  e.textContent=icon;
+  e.style.left=Math.random()*80+"%";
+  e.style.top="60%";
+  document.body.appendChild(e);
+  setTimeout(()=>e.remove(),2500);
+}
 
 /* ===== HISTÓRIA ===== */
-const historia=[
- ["Narrador","Em 11 de setembro de 2025, tudo começou 🌅","carta.png","bg-por-do-sol.jpg"],
- ["Max","Você chegou e mudou tudo 💖","flor.png","bg-cerejeira.jpg"],
- ["Andrelly","Meu coração escolheu você 🌸","estrela.png","bg-cerejeira.jpg"],
- ["Narrador","Sob as estrelas, nosso amor cresceu ✨","brilho.png","bg-noite.jpg"]
-];
-let h=0;
+const story={
+  start:{
+    name:"Narrador",
+    text:"Em 11 de setembro de 2025, tudo começou 🌅",
+    bg:"bg-por-do-sol.jpg",
+    effect:"✨",
+    choices:[
+      {label:"🌸 Chegar mais perto", next:"close"},
+      {label:"💭 Observar em silêncio", next:"silent"}
+    ]
+  },
+  close:{
+    name:"Max",
+    text:"Quando eu te vi, senti que era diferente 💖",
+    bg:"bg-cerejeira.jpg",
+    effect:"💗",
+    choices:[
+      {label:"🤍 Segurar sua mão", next:"hand"}
+    ]
+  },
+  silent:{
+    name:"Narrador",
+    text:"Mesmo em silêncio, o amor já existia ✨",
+    bg:"bg-cerejeira.jpg",
+    effect:"✨",
+    choices:[
+      {label:"💗 Criar coragem", next:"hand"}
+    ]
+  },
+  hand:{
+    name:"Andrelly",
+    text:"Naquele toque, meu coração escolheu você 🌸",
+    bg:"bg-noite.jpg",
+    effect:"🌸",
+    choices:[
+      {label:"📜 Fazer uma promessa", next:"promise"}
+    ]
+  },
+  promise:{
+    name:"Narrador",
+    text:"E desde então, essa história nunca parou de crescer 💍",
+    bg:"bg-noite.jpg",
+    effect:"💍",
+    choices:[
+      {label:"📸 Ver nossas memórias", next:"photos"}
+    ]
+  }
+};
 
-function start(){show("novel");nextStory()}
-
-function nextStory(){
-  if(h<historia.length){
-    nome.textContent=historia[h][0];
-    texto.textContent=historia[h][1];
-    icone.src=historia[h][2];
-    novel.style.backgroundImage=`url('${historia[h][3]}')`;
-    h++;
-  }else iniciarJogo();
+function startGame(){
+  show("game");
+  loadScene("start");
 }
 
-/* ===== JOGO ===== */
-let pontos=0,gameLoop;
+function loadScene(key){
+  const s=story[key];
+  game.style.backgroundImage=`url('${s.bg}')`;
+  name.textContent=s.name;
+  text.textContent=s.text;
+  choices.innerHTML="";
+  if(s.effect) spawnEffect(s.effect);
 
-function iniciarJogo(){
-  show("jogo");
-  musica=1;tocar();
-  gameLoop=setInterval(spawn,800);
+  s.choices.forEach(c=>{
+    const btn=document.createElement("button");
+    btn.className="choice";
+    btn.textContent=c.label;
+    btn.onclick=()=>{
+      if(c.next==="photos") startGallery();
+      else loadScene(c.next);
+    };
+    choices.appendChild(btn);
+  });
 }
 
-function spawn(){
-  const c=document.createElement("img");
-  c.src="heart.png";
-  c.className="coracao";
-  c.style.width="35px";
-  c.style.left=Math.random()*90+"%";
-  c.style.animationDuration="5s";
-  jogo.appendChild(c);
-  c.onclick=()=>{
-    pontos++;c.remove();
-    if(pontos>=6){
-      clearInterval(gameLoop);
-      iniciarFotos();
-    }
-  };
-  setTimeout(()=>c.remove(),5000);
+/* ===== GALERIA ===== */
+let photoIndex=1;
+function startGallery(){
+  show("gallery");
+  photo.src="foto1.jpg";
 }
-
-/* mouse + touch */
-document.addEventListener("mousemove",e=>{
-  playerChar.style.left=e.clientX+"px";
-});
-document.addEventListener("touchmove",e=>{
-  playerChar.style.left=e.touches[0].clientX+"px";
-});
-
-/* ===== FOTOS ===== */
-let f=1;
-function iniciarFotos(){
-  show("fotos");
-  musica=2;tocar();
-  fotoAtual.src="foto1.jpg";
-}
-function nextFoto(){
-  f++;
-  if(f>10) finalizar();
-  else fotoAtual.src="foto"+f+".jpg";
+function nextPhoto(){
+  photoIndex++;
+  if(photoIndex>10) finishStory();
+  else photo.src=`foto${photoIndex}.jpg`;
 }
 
 /* ===== FINAL ===== */
-function finalizar(){
-  show("final");
-  const inicio=new Date("2025-09-11T00:00:00");
+function finishStory(){
+  show("end");
+  const start=new Date("2025-09-11T00:00:00");
   setInterval(()=>{
-    const d=new Date()-inicio;
-    tempo.textContent=
-      `Estamos juntos há ${Math.floor(d/86400000)} dias 💖`;
+    const d=new Date()-start;
+    timer.textContent=
+      `Juntos há ${Math.floor(d/86400000)} dias 💖`;
   },1000);
 }
 </script>
