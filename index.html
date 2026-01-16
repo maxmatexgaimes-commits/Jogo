@@ -6,7 +6,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-/* ================= VARIÁVEIS ================= */
 :root{
   --rosa:#ff7eb6;
   --rosa2:#ffd1e8;
@@ -14,24 +13,13 @@
   --box:rgba(255,255,255,.95);
 }
 
-/* ================= RESET ================= */
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:'Trebuchet MS','Comic Sans MS',cursive;
-}
+/* RESET */
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Trebuchet MS','Comic Sans MS',cursive}
+body{background:#fff;color:var(--texto);overflow:hidden}
 
-body{
-  background:#fff;
-  color:var(--texto);
-  overflow:hidden;
-}
-
-/* ================= TELAS ================= */
+/* TELAS */
 .screen{
-  position:fixed;
-  inset:0;
+  position:fixed; inset:0;
   display:none;
   justify-content:center;
   align-items:center;
@@ -42,27 +30,38 @@ body{
 }
 .screen.active{display:flex}
 
-/* ================= INTRO ================= */
-#intro video{
-  position:absolute;
-  inset:0;
+/* ===== LIVRO (AGORA EM CIMA E VISÍVEL) ===== */
+#book{
+  position:fixed;
+  top:8px;
   width:100%;
-  height:100%;
-  object-fit:cover;
-  z-index:1;
+  text-align:center;
+  font-size:.95em;
+  z-index:999;
+  color:#5a2a3d;
+  background:rgba(255,255,255,.7);
+  padding:6px 10px;
+  backdrop-filter:blur(6px);
+  animation:slide 12s linear infinite;
 }
-#intro::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:rgba(0,0,0,.45);
-  z-index:2;
-}
-#intro button{
-  z-index:3;
+@keyframes slide{
+  from{transform:translateX(100%)}
+  to{transform:translateX(-100%)}
 }
 
-/* ================= CAIXA ================= */
+/* INTRO */
+#intro video{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  object-fit:cover; z-index:1;
+}
+#intro::after{
+  content:""; position:absolute; inset:0;
+  background:rgba(0,0,0,.45); z-index:2;
+}
+#intro button{z-index:3}
+
+/* CAIXA */
 .box{
   background:var(--box);
   padding:26px;
@@ -71,20 +70,20 @@ body{
   box-shadow:0 15px 35px rgba(0,0,0,.25);
 }
 
-/* ================= BOTÕES ================= */
+/* BOTÕES */
 button{
   padding:14px 38px;
   border:none;
   border-radius:30px;
   background:var(--rosa);
   color:#fff;
-  font-size:1em;
   margin-top:15px;
+  font-size:1em;
   box-shadow:0 8px 18px rgba(0,0,0,.25);
 }
 button:active{transform:scale(.96)}
 
-/* ================= TEXTO BRILHANTE ================= */
+/* TEXTO BRILHO */
 .glow{
   background:linear-gradient(90deg,var(--rosa),#ffe6f2,var(--rosa));
   background-size:200%;
@@ -94,43 +93,20 @@ button:active{transform:scale(.96)}
 }
 @keyframes glow{to{background-position:200%}}
 
-/* ================= LIVRO ================= */
-#book{
-  position:fixed;
-  bottom:6px;
-  font-size:.9em;
-  opacity:.85;
-  white-space:nowrap;
-  animation:book 20s linear infinite;
-}
-@keyframes book{from{left:100%}to{left:-100%}}
-
-/* ================= DIÁLOGO ================= */
+/* DIÁLOGO */
 .dialog{
-  position:absolute;
-  bottom:0;
+  position:absolute; bottom:0;
   width:100%;
   background:var(--box);
   padding:22px;
   border-radius:30px 30px 0 0;
 }
 
-/* ================= ESCOLHAS ================= */
-#choices{
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-  margin-top:14px;
-}
-.choice{
-  background:var(--rosa2);
-  color:var(--texto);
-  padding:14px;
-  border-radius:25px;
-  border:none;
-}
+/* ESCOLHAS */
+#choices{display:flex;flex-direction:column;gap:12px;margin-top:14px}
+.choice{background:var(--rosa2);color:var(--texto);padding:14px;border-radius:25px;border:none}
 
-/* ================= EFEITOS ================= */
+/* EFEITOS */
 .effect{
   position:absolute;
   font-size:26px;
@@ -142,58 +118,35 @@ button:active{transform:scale(.96)}
   to{opacity:0;transform:translateY(-120px)}
 }
 
-/* ================= JOGO ================= */
-#gameArea{
-  position:relative;
-  width:100%;
-  height:100%;
-}
-#maxChar{
-  position:absolute;
-  bottom:110px;
-  left:5%;
-  font-size:48px;
-  transition:left .4s;
-}
-#andrellyChar{
-  position:absolute;
-  bottom:110px;
-  right:5%;
-  font-size:48px;
-}
+/* JOGO */
+#gameArea{position:relative;width:100%;height:100%}
+#maxChar{position:absolute;bottom:110px;left:5%;font-size:48px;transition:left .4s}
+#andrellyChar{position:absolute;bottom:110px;right:5%;font-size:48px}
 
-/* ================= BARRA ================= */
-#bar{
-  width:80%;
-  height:16px;
-  background:#eee;
-  border-radius:20px;
-  overflow:hidden;
-}
-#fill{
-  height:100%;
-  width:0%;
-  background:linear-gradient(90deg,#ff7eb6,#ffd1e8);
-  transition:.4s;
-}
+/* BARRA */
+#bar{width:80%;height:16px;background:#eee;border-radius:20px;overflow:hidden}
+#fill{height:100%;width:0%;background:linear-gradient(90deg,#ff7eb6,#ffd1e8);transition:.4s}
 
-/* ================= CAPIVARA ================= */
+/* CAPIVARA */
 .capivara{
   position:absolute;
   font-size:30px;
   cursor:pointer;
-  animation:bounce 1.2s infinite alternate;
+  animation:bounce 1s infinite alternate;
+  z-index:20;
 }
-@keyframes bounce{
-  from{transform:translateY(0)}
-  to{transform:translateY(-8px)}
-}
+@keyframes bounce{from{transform:translateY(0)}to{transform:translateY(-8px)}}
 
-/* ================= FOTO ================= */
-#photo{
-  width:300px;
-  max-width:90vw;
-  border-radius:25px;
+/* HUD */
+#hud{
+  position:fixed;
+  bottom:10px;
+  left:10px;
+  background:rgba(255,255,255,.85);
+  padding:6px 12px;
+  border-radius:20px;
+  font-size:.9em;
+  z-index:999;
 }
 </style>
 </head>
@@ -201,7 +154,9 @@ button:active{transform:scale(.96)}
 <body>
 
 <audio id="audio"></audio>
+
 <div id="book">📖✒️ Nossa história está sendo escrita… e não vai acabar nunca 💖</div>
+<div id="hud">🦫 Capivaras: <span id="capiCount">0</span>/3</div>
 
 <!-- INTRO -->
 <div id="intro" class="screen active">
@@ -227,18 +182,9 @@ button:active{transform:scale(.96)}
     <div id="andrellyChar">💖</div>
   </div>
   <div class="box">
-    <p>Conexão 💞</p>
+    <p>Conexão emocional 💞</p>
     <div id="bar"><div id="fill"></div></div>
     <button onclick="connect()">Aproximar 💗</button>
-  </div>
-</div>
-
-<!-- GALERIA -->
-<div id="gallery" class="screen" style="background-image:url('bg-cerejeira.jpg')">
-  <div class="box">
-    <h2>📸 Nossas Memórias</h2>
-    <img id="photo">
-    <button onclick="nextPhoto()">Próxima</button>
   </div>
 </div>
 
@@ -252,44 +198,31 @@ button:active{transform:scale(.96)}
 </div>
 
 <script>
-/* ================= CONTROLE DE TELAS ================= */
 const screens=[...document.querySelectorAll(".screen")];
-const show=id=>{
-  screens.forEach(s=>s.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
-};
+const show=id=>{screens.forEach(s=>s.classList.remove("active"));document.getElementById(id).classList.add("active")}
 
-/* ================= MÚSICA ================= */
+/* MÚSICA */
 const audio=document.getElementById("audio");
 const playlist=["musica1.mp3","musica2.mp3","musica3.mp3"];
 let track=0;
-function playMusic(){
-  audio.src=playlist[track];
-  audio.volume=.6;
-  audio.play();
-}
-audio.onended=()=>{
-  track=(track+1)%playlist.length;
-  playMusic();
-};
+function playMusic(){audio.src=playlist[track];audio.volume=.6;audio.play()}
+audio.onended=()=>{track=(track+1)%playlist.length;playMusic()}
 
-/* ================= EFEITO ================= */
+/* EFEITO */
 function effect(icon){
   const e=document.createElement("div");
   e.className="effect";
   e.textContent=icon;
   e.style.left=Math.random()*80+"%";
   e.style.top="60%";
-  document.body.appendChild(e);
+  document.querySelector(".screen.active").appendChild(e);
   setTimeout(()=>e.remove(),3000);
 }
 
-/* ================= CAPIVARAS ================= */
-let capi=0;
-let secretUnlocked=false;
-
+/* CAPIVARAS */
+let capi=0, secret=false;
 function spawnCapivara(){
-  if(Math.random()<0.4){
+  if(Math.random()<0.45){
     const c=document.createElement("div");
     c.className="capivara";
     c.textContent="🦫";
@@ -297,27 +230,27 @@ function spawnCapivara(){
     c.style.top=Math.random()*60+"%";
     c.onclick=()=>{
       capi++;
+      document.getElementById("capiCount").textContent=capi;
       effect("💖");
       c.remove();
-      if(capi>=3) secretUnlocked=true;
+      if(capi>=3) secret=true;
     };
-    document.body.appendChild(c);
-    setTimeout(()=>c.remove(),4000);
+    document.querySelector(".screen.active").appendChild(c);
+    setTimeout(()=>c.remove(),4500);
   }
 }
 
-/* ================= HISTÓRIA ================= */
+/* HISTÓRIA */
 const story=[
 ["Narrador","Em 11 de setembro de 2025, tudo começou 🌅"],
 ["Max","Desde a primeira conversa, algo mudou 💖"],
-["Andrelly","Seu jeito me fez sorrir sem perceber 🌸"],
+["Andrelly","Seu jeito me fez sorrir 🌸"],
 ["Narrador","As mensagens viraram carinho 💬"],
 ["Max","Eu quero ficar com você 💍"]
 ];
 let idx=0;
 
-const enterBtn=document.getElementById("enterBtn");
-enterBtn.onclick=()=>{
+document.getElementById("enterBtn").onclick=()=>{
   playMusic();
   show("story");
   loadStory();
@@ -341,54 +274,31 @@ function loadStory(){
   choices.appendChild(b);
 }
 
-/* ================= JOGO ================= */
+/* JOGO */
 let progress=0;
 function connect(){
-  const bonus=Math.random()>0.7?30:20;
-  progress+=bonus;
+  progress+=Math.random()>0.7?30:20;
   if(progress>100) progress=100;
   fill.style.width=progress+"%";
   maxChar.style.left=(5+progress/2)+"%";
   effect("💗");
   spawnCapivara();
-  if(progress>=100) setTimeout(startGallery,600);
+  if(progress>=100) finish();
 }
 
-/* ================= GALERIA ================= */
-let p=1;
-function startGallery(){
-  show("gallery");
-  photo.src="foto1.jpg";
-}
-function nextPhoto(){
-  p++;
-  spawnCapivara();
-  if(p>10) finish();
-  else photo.src=`foto${p}.jpg`;
-}
-
-/* ================= FINAL ================= */
+/* FINAL */
 function finish(){
   show("end");
-
-  finalTitle.textContent=secretUnlocked
-    ?"Final Secreto 💍🦫"
-    :"Nosso Para Sempre 💖";
-
-  finalText.textContent=secretUnlocked
-    ?"Até as capivaras sabem: esse amor é eterno 🦫💖"
+  finalTitle.textContent=secret?"Final Secreto 💍🦫":"Nosso Para Sempre 💖";
+  finalText.textContent=secret
+    ?"Até as capivaras sabem: esse amor é eterno."
     :"Prometo te escolher todos os dias.";
 
-  const startDate=new Date("2025-09-11T00:00:00");
-
+  const start=new Date("2025-09-11T00:00:00");
   setInterval(()=>{
-    const d=new Date()-startDate;
-    const days=Math.floor(d/86400000);
-    const h=Math.floor(d/3600000)%24;
-    const m=Math.floor(d/60000)%60;
-    const s=Math.floor(d/1000)%60;
+    const d=new Date()-start;
     timer.textContent=
-      `${days} dias ${h}h ${m}m ${s}s juntos 💖`;
+      `${Math.floor(d/86400000)} dias ${Math.floor(d/3600000)%24}h ${Math.floor(d/60000)%60}m ${Math.floor(d/1000)%60}s 💖`;
   },1000);
 }
 </script>
