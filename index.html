@@ -6,12 +6,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Comic Sans MS',cursive}
-body{overflow:hidden;color:#5a2a3d}
+*{
+  margin:0;padding:0;box-sizing:border-box;
+  font-family:'Comic Sans MS',cursive;
+}
+
+body{
+  overflow:hidden;
+  background:#fff;
+  color:#5a2a3d;
+}
 
 /* ===== TELAS ===== */
 .tela{
-  position:fixed; inset:0;
+  position:fixed;
+  inset:0;
   display:none;
   justify-content:center;
   align-items:center;
@@ -19,17 +28,45 @@ body{overflow:hidden;color:#5a2a3d}
   text-align:center;
   background-size:cover;
   background-position:center;
+  animation:fade .6s ease;
 }
-.ativa{display:flex}
+.tela.ativa{display:flex}
+
+@keyframes fade{
+  from{opacity:0;transform:scale(.98)}
+  to{opacity:1}
+}
+
+/* ===== INTRO ===== */
+#intro::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,.35);
+  z-index:1;
+}
 
 /* ===== OVERLAY ===== */
 .overlay{
-  background:rgba(255,255,255,.7);
-  padding:20px;
+  background:rgba(255,255,255,.85);
+  padding:25px;
   border-radius:25px;
 }
 
-/* ===== BRILHO TEXTO ===== */
+/* ===== BOTÕES ===== */
+button{
+  padding:14px 45px;
+  border:none;
+  border-radius:30px;
+  background:#ff7eb6;
+  color:white;
+  font-size:1.1em;
+  cursor:pointer;
+  box-shadow:0 8px 20px rgba(0,0,0,.25);
+}
+button:active{transform:scale(.96)}
+
+/* ===== BRILHO ===== */
 .brilho{
   background:linear-gradient(90deg,#ff7eb6,#ffd1e8,#ff7eb6);
   background-size:200%;
@@ -39,31 +76,21 @@ body{overflow:hidden;color:#5a2a3d}
 }
 @keyframes brilho{to{background-position:200%}}
 
-/* ===== BOTÕES ===== */
-button{
-  padding:12px 40px;
-  margin:10px;
-  border:none;
-  border-radius:30px;
-  background:#ff7eb6;
-  color:white;
-  font-size:1.1em;
-  cursor:pointer;
-}
-
 /* ===== PLAYER ===== */
 #player{
   position:fixed;
-  bottom:15px; right:15px;
+  bottom:15px;
+  right:15px;
   background:#fff;
   padding:10px 15px;
   border-radius:30px;
-  display:flex; gap:10px;
-  z-index:999;
+  display:flex;
+  gap:10px;
+  z-index:1000;
 }
 
 /* ===== DIÁLOGO ===== */
-#dialogo{
+.dialogo{
   position:absolute;
   bottom:0;
   width:100%;
@@ -71,7 +98,6 @@ button{
   padding:20px;
   border-radius:30px 30px 0 0;
 }
-#nome{font-weight:bold}
 
 /* ===== LIVRO ===== */
 #livro{
@@ -80,26 +106,24 @@ button{
   white-space:nowrap;
   animation:livro 15s linear infinite;
 }
-@keyframes livro{from{left:100%}to{left:-100%}}
+@keyframes livro{
+  from{left:100%}
+  to{left:-100%}
+}
 
 /* ===== JOGO ===== */
-#jogo{background:linear-gradient(#ffeef7,#fff)}
-#max{position:absolute;bottom:40px;font-size:55px}
+#playerChar{
+  position:absolute;
+  bottom:50px;
+  font-size:55px;
+}
 .coracao{
-  position:absolute;top:-40px;
+  position:absolute;
+  top:-40px;
   animation:cair linear;
 }
-@keyframes cair{to{transform:translateY(120vh)}}
-
-/* ===== BRILHO PNG ===== */
-.sparkle{
-  position:absolute;
-  width:40px;
-  animation:spark 6s linear infinite;
-}
-@keyframes spark{
-  from{transform:translateY(120vh) scale(.5);opacity:0}
-  to{transform:translateY(-20vh) scale(1.2);opacity:1}
+@keyframes cair{
+  to{transform:translateY(120vh)}
 }
 </style>
 </head>
@@ -108,22 +132,21 @@ button{
 
 <audio id="audio" loop></audio>
 
-<!-- PLAYER -->
 <div id="player">
   <button onclick="prev()">⏮️</button>
-  <button onclick="play()">⏯️</button>
+  <button onclick="playPause()">⏯️</button>
   <button onclick="next()">⏭️</button>
 </div>
 
-<!-- LIVRO -->
 <div id="livro">📖✒️ Nossa história está sendo escrita… e não vai acabar nunca 💖</div>
 
 <!-- INTRO -->
 <div id="intro" class="tela ativa">
-  <video autoplay muted playsinline style="width:100%;height:100%;object-fit:cover">
-    <source src="intro.mp4">
+  <video autoplay muted playsinline
+    style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0">
+    <source src="intro.mp4" type="video/mp4">
   </video>
-  <button onclick="enter()" style="position:absolute;bottom:40px">
+  <button onclick="entrar()" style="z-index:2">
     Entrar na nossa história 💖
   </button>
 </div>
@@ -139,20 +162,20 @@ button{
 
 <!-- VISUAL NOVEL -->
 <div id="novel" class="tela">
-  <div id="dialogo">
-    <div id="nome"></div>
-    <div id="texto"></div>
-    <img id="icone" style="width:40px;margin-top:10px">
+  <div class="dialogo">
+    <strong id="nome"></strong>
+    <p id="texto"></p>
+    <img id="icone" width="40"><br>
     <button onclick="nextStory()">Continuar</button>
   </div>
 </div>
 
 <!-- JOGO -->
 <div id="jogo" class="tela">
-  <div id="max">👦</div>
-  <div id="dialogo">
-    <div id="nome">Narrador</div>
-    <div id="texto">Colete os corações do amor 💗</div>
+  <div id="playerChar">👦</div>
+  <div class="dialogo">
+    <strong>Narrador</strong>
+    <p>Colete os corações do amor 💗</p>
   </div>
 </div>
 
@@ -160,9 +183,8 @@ button{
 <div id="fotos" class="tela" style="background-image:url('bg-cerejeira.jpg')">
   <div class="overlay">
     <h2>📸 Memórias</h2>
-    <img id="img" style="width:300px;border-radius:25px">
-    <p>Cada foto guarda um pedacinho do nosso amor 🌸</p>
-    <button onclick="foto()">Próxima</button>
+    <img id="fotoAtual" style="width:300px;border-radius:25px">
+    <button onclick="nextFoto()">Próxima</button>
   </div>
 </div>
 
@@ -175,51 +197,56 @@ button{
 </div>
 
 <script>
-/* ===== TELAS ===== */
+/* ===== CONTROLE DE TELAS ===== */
 const telas=document.querySelectorAll(".tela");
-const audio=document.getElementById("audio");
-function show(id){
+const show=id=>{
   telas.forEach(t=>t.classList.remove("ativa"));
   document.getElementById(id).classList.add("ativa");
-}
+};
 
-/* ===== PLAYLIST ===== */
-const musicas=["musica1.mp3","musica2.mp3","musica3.mp3"];
-let m=0;
-function tocar(){audio.src=musicas[m];audio.volume=.6;audio.play()}
-function play(){audio.paused?audio.play():audio.pause()}
-function next(){m=(m+1)%musicas.length;tocar()}
-function prev(){m=(m-1+musicas.length)%musicas.length;tocar()}
+/* ===== MÚSICA ===== */
+const audio=document.getElementById("audio");
+const playlist=["musica1.mp3","musica2.mp3","musica3.mp3"];
+let musica=0;
+
+const tocar=()=>{audio.src=playlist[musica];audio.volume=.6;audio.play()}
+const playPause=()=>audio.paused?audio.play():audio.pause();
+const next=()=>{musica=(musica+1)%playlist.length;tocar()}
+const prev=()=>{musica=(musica-1+playlist.length)%playlist.length;tocar()}
 
 /* ===== INTRO ===== */
-function enter(){tocar();show("inicio")}
+function entrar(){tocar();show("inicio")}
 
 /* ===== HISTÓRIA ===== */
 const historia=[
  ["Narrador","Em 11 de setembro de 2025, tudo começou 🌅","carta.png","bg-por-do-sol.jpg"],
  ["Max","Você chegou e mudou tudo 💖","flor.png","bg-cerejeira.jpg"],
- ["Andrelly","Meu coração encontrou o seu 🌸","estrela.png","bg-cerejeira.jpg"],
- ["Narrador","E sob as estrelas, o amor cresceu ✨","brilho.png","bg-noite.jpg"]
+ ["Andrelly","Meu coração escolheu você 🌸","estrela.png","bg-cerejeira.jpg"],
+ ["Narrador","Sob as estrelas, nosso amor cresceu ✨","brilho.png","bg-noite.jpg"]
 ];
-let i=0;
+let h=0;
 
 function start(){show("novel");nextStory()}
+
 function nextStory(){
-  if(i<historia.length){
-    nome.innerText=historia[i][0];
-    texto.innerText=historia[i][1];
-    icone.src=historia[i][2];
-    novel.style.backgroundImage=`url('${historia[i][3]}')`;
-    i++;
+  if(h<historia.length){
+    nome.textContent=historia[h][0];
+    texto.textContent=historia[h][1];
+    icone.src=historia[h][2];
+    novel.style.backgroundImage=`url('${historia[h][3]}')`;
+    h++;
   }else iniciarJogo();
 }
 
 /* ===== JOGO ===== */
-let pontos=0;
+let pontos=0,gameLoop;
+
 function iniciarJogo(){
-  m=1;tocar();show("jogo");
-  setInterval(spawn,700);
+  show("jogo");
+  musica=1;tocar();
+  gameLoop=setInterval(spawn,800);
 }
+
 function spawn(){
   const c=document.createElement("img");
   c.src="heart.png";
@@ -230,18 +257,33 @@ function spawn(){
   jogo.appendChild(c);
   c.onclick=()=>{
     pontos++;c.remove();
-    if(pontos>=6) iniciarFotos();
+    if(pontos>=6){
+      clearInterval(gameLoop);
+      iniciarFotos();
+    }
   };
   setTimeout(()=>c.remove(),5000);
 }
 
+/* mouse + touch */
+document.addEventListener("mousemove",e=>{
+  playerChar.style.left=e.clientX+"px";
+});
+document.addEventListener("touchmove",e=>{
+  playerChar.style.left=e.touches[0].clientX+"px";
+});
+
 /* ===== FOTOS ===== */
 let f=1;
-function iniciarFotos(){m=2;tocar();show("fotos");img.src="foto1.jpg"}
-function foto(){
+function iniciarFotos(){
+  show("fotos");
+  musica=2;tocar();
+  fotoAtual.src="foto1.jpg";
+}
+function nextFoto(){
   f++;
   if(f>10) finalizar();
-  else img.src="foto"+f+".jpg";
+  else fotoAtual.src="foto"+f+".jpg";
 }
 
 /* ===== FINAL ===== */
@@ -250,8 +292,8 @@ function finalizar(){
   const inicio=new Date("2025-09-11T00:00:00");
   setInterval(()=>{
     const d=new Date()-inicio;
-    tempo.innerText=
-    `Estamos juntos há ${Math.floor(d/86400000)} dias 💖`;
+    tempo.textContent=
+      `Estamos juntos há ${Math.floor(d/86400000)} dias 💖`;
   },1000);
 }
 </script>
